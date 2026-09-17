@@ -64,5 +64,74 @@ namespace ILS.RfqManagement.Tests.Services
             actual.ShouldBeTrue();
             repository.Verify();
         }
+
+        [Fact]
+        public void GetAssignmentRules_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var rules = Builder<AssignmentRuleSummary>.CreateListOfSize(2).Build();
+            var repository = new Mock<IRfqManagementRepository>();
+            repository.Setup(r => r.GetAssignmentRules("5024")).Returns(rules).Verifiable();
+            var sut = new RfqManagementService(repository.Object);
+
+            // Act
+            var actual = sut.GetAssignmentRules("5024");
+
+            // Assert
+            actual.ShouldBe(rules);
+            repository.Verify();
+        }
+
+        [Fact]
+        public void GetAssignmentRule_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var rule = Builder<AssignmentRuleDetail>.CreateNew().Build();
+            var repository = new Mock<IRfqManagementRepository>();
+            repository.Setup(r => r.GetAssignmentRule("rule-guid-1")).Returns(rule).Verifiable();
+            var sut = new RfqManagementService(repository.Object);
+
+            // Act
+            var actual = sut.GetAssignmentRule("rule-guid-1");
+
+            // Assert
+            actual.ShouldBe(rule);
+            repository.Verify();
+        }
+
+        [Fact]
+        public void SaveAssignmentRule_ShouldSaveThenReturnTheSavedRule()
+        {
+            // Arrange
+            var request = new SaveAssignmentRuleRequest { SupplierCompanyId = "5024", AssignToCompanyId = "5030", AdministratorId = "admin-guid-1" };
+            var savedRule = Builder<AssignmentRuleDetail>.CreateNew().Build();
+            var repository = new Mock<IRfqManagementRepository>();
+            repository.Setup(r => r.SaveAssignmentRule(request, "auditUser")).Returns("rule-guid-1").Verifiable();
+            repository.Setup(r => r.GetAssignmentRule("rule-guid-1")).Returns(savedRule).Verifiable();
+            var sut = new RfqManagementService(repository.Object);
+
+            // Act
+            var actual = sut.SaveAssignmentRule(request, "auditUser");
+
+            // Assert
+            actual.ShouldBe(savedRule);
+            repository.Verify();
+        }
+
+        [Fact]
+        public void DeleteAssignmentRule_ShouldReturnTrue()
+        {
+            // Arrange
+            var repository = new Mock<IRfqManagementRepository>();
+            repository.Setup(r => r.DeleteAssignmentRule("rule-guid-1", "auditUser")).Verifiable();
+            var sut = new RfqManagementService(repository.Object);
+
+            // Act
+            var actual = sut.DeleteAssignmentRule("rule-guid-1", "auditUser");
+
+            // Assert
+            actual.ShouldBeTrue();
+            repository.Verify();
+        }
     }
 }

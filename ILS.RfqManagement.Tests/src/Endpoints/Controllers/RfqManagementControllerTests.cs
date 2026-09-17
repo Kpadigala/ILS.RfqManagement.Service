@@ -141,5 +141,193 @@ namespace ILS.RfqManagement.Tests.Endpoints.Controllers
             actual.ShouldNotBeNull();
             serviceMock.Verify(s => s.RemoveAdministrators(It.IsAny<RemoveAdministratorsRequest>(), It.IsAny<string>()), Times.Never);
         }
+
+        [Fact]
+        public void GetAssignmentRules_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var supplierCompanyId = "5024";
+            var rules = Builder<AssignmentRuleSummary>.CreateListOfSize(2).Build();
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.GetAssignmentRules(supplierCompanyId)).Returns(rules).Verifiable();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.GetAssignmentRules(supplierCompanyId);
+
+            // Assert
+            actual.Result.ShouldBeNull();
+            actual.Value.ShouldBe(rules);
+            serviceMock.Verify();
+        }
+
+        [Fact]
+        public void GetAssignmentRules_WithEmptySupplierCompanyId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.GetAssignmentRules(string.Empty).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.GetAssignmentRules(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void GetAssignmentRule_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var assignmentRuleId = "rule-guid-1";
+            var rule = Builder<AssignmentRuleDetail>.CreateNew().Build();
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.GetAssignmentRule(assignmentRuleId)).Returns(rule).Verifiable();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.GetAssignmentRule(assignmentRuleId);
+
+            // Assert
+            actual.Value.ShouldBe(rule);
+            serviceMock.Verify();
+        }
+
+        [Fact]
+        public void GetAssignmentRule_WithEmptyAssignmentRuleId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.GetAssignmentRule(string.Empty).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.GetAssignmentRule(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void GetAssignmentRule_WhenNotFound_ShouldReturnNotFound()
+        {
+            // Arrange
+            var assignmentRuleId = "missing-rule";
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.GetAssignmentRule(assignmentRuleId)).Returns((AssignmentRuleDetail)null);
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.GetAssignmentRule(assignmentRuleId).Result as NotFoundResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+        }
+
+        [Fact]
+        public void SaveAssignmentRule_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var request = new SaveAssignmentRuleRequest
+            {
+                SupplierCompanyId = "5024",
+                AssignToCompanyId = "5030",
+                AdministratorId = "admin-guid-1"
+            };
+            var savedRule = Builder<AssignmentRuleDetail>.CreateNew().Build();
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.SaveAssignmentRule(request, It.IsAny<string>())).Returns(savedRule).Verifiable();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.SaveAssignmentRule(request);
+
+            // Assert
+            actual.Result.ShouldBeNull();
+            actual.Value.ShouldBe(savedRule);
+            serviceMock.Verify();
+        }
+
+        [Fact]
+        public void SaveAssignmentRule_WithEmptySupplierCompanyId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var request = new SaveAssignmentRuleRequest { SupplierCompanyId = string.Empty, AssignToCompanyId = "5030", AdministratorId = "admin-guid-1" };
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.SaveAssignmentRule(request).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.SaveAssignmentRule(It.IsAny<SaveAssignmentRuleRequest>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void SaveAssignmentRule_WithEmptyAssignToCompanyId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var request = new SaveAssignmentRuleRequest { SupplierCompanyId = "5024", AssignToCompanyId = string.Empty, AdministratorId = "admin-guid-1" };
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.SaveAssignmentRule(request).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.SaveAssignmentRule(It.IsAny<SaveAssignmentRuleRequest>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void SaveAssignmentRule_WithEmptyAdministratorId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var request = new SaveAssignmentRuleRequest { SupplierCompanyId = "5024", AssignToCompanyId = "5030", AdministratorId = string.Empty };
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.SaveAssignmentRule(request).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.SaveAssignmentRule(It.IsAny<SaveAssignmentRuleRequest>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteAssignmentRule_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var assignmentRuleId = "rule-guid-1";
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.DeleteAssignmentRule(assignmentRuleId, It.IsAny<string>())).Returns(true).Verifiable();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.DeleteAssignmentRule(assignmentRuleId);
+
+            // Assert
+            actual.Result.ShouldBeNull();
+            actual.Value.ShouldBe(true);
+            serviceMock.Verify();
+        }
+
+        [Fact]
+        public void DeleteAssignmentRule_WithEmptyAssignmentRuleId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.DeleteAssignmentRule(string.Empty).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.DeleteAssignmentRule(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        }
     }
 }

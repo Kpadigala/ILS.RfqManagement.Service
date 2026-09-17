@@ -85,5 +85,94 @@ namespace ILS.RfqManagement.Endpoints.Controllers
 
             return _service.RemoveAdministrators(request, auditUser);
         }
+
+        /// <summary>
+        /// Retrieves the active assignment rules for a supplier company.
+        /// </summary>
+        /// <param name="supplierCompanyId">The supplier company identifier.</param>
+        /// <returns>The assignment rules for the specified supplier company.</returns>
+        /// <response code="200">Returns the assignment rules.</response>
+        /// <response code="400">If the supplierCompanyId is missing or invalid.</response>
+        [HttpGet("assignments/{supplierCompanyId}")]
+        [ProducesResponseType(typeof(IEnumerable<AssignmentRuleSummary>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<AssignmentRuleSummary>> GetAssignmentRules(string supplierCompanyId)
+        {
+            if (string.IsNullOrEmpty(supplierCompanyId))
+                return BadRequest(new { Message = "supplierCompanyId is empty." });
+
+            return _service.GetAssignmentRules(supplierCompanyId).ToList();
+        }
+
+        /// <summary>
+        /// Retrieves a single assignment rule, including its criteria and escalation settings.
+        /// </summary>
+        /// <param name="assignmentRuleId">The assignment rule identifier.</param>
+        /// <returns>The assignment rule detail.</returns>
+        /// <response code="200">Returns the assignment rule.</response>
+        /// <response code="400">If the assignmentRuleId is missing or invalid.</response>
+        /// <response code="404">If no rule exists with the specified id.</response>
+        [HttpGet("assignments/rule/{assignmentRuleId}")]
+        [ProducesResponseType(typeof(AssignmentRuleDetail), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public ActionResult<AssignmentRuleDetail> GetAssignmentRule(string assignmentRuleId)
+        {
+            if (string.IsNullOrEmpty(assignmentRuleId))
+                return BadRequest(new { Message = "assignmentRuleId is empty." });
+
+            var rule = _service.GetAssignmentRule(assignmentRuleId);
+
+            if (rule == null)
+                return NotFound();
+
+            return rule;
+        }
+
+        /// <summary>
+        /// Creates a new assignment rule, or edits an existing one when AssignmentRuleId is set.
+        /// </summary>
+        /// <param name="request">The assignment rule to save.</param>
+        /// <returns>The saved assignment rule.</returns>
+        /// <response code="200">Returns the saved assignment rule.</response>
+        /// <response code="400">If the request is invalid.</response>
+        [HttpPost("assignments/save")]
+        [ProducesResponseType(typeof(AssignmentRuleDetail), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<AssignmentRuleDetail> SaveAssignmentRule([FromBody] SaveAssignmentRuleRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.SupplierCompanyId))
+                return BadRequest(new { Message = "SupplierCompanyId is empty." });
+
+            if (string.IsNullOrEmpty(request.AssignToCompanyId))
+                return BadRequest(new { Message = "AssignToCompanyId is empty." });
+
+            if (string.IsNullOrEmpty(request.AdministratorId))
+                return BadRequest(new { Message = "AdministratorId is empty." });
+
+            var auditUser = HttpContext.GetUserId();
+
+            return _service.SaveAssignmentRule(request, auditUser);
+        }
+
+        /// <summary>
+        /// Deletes an assignment rule.
+        /// </summary>
+        /// <param name="assignmentRuleId">The assignment rule identifier.</param>
+        /// <returns>True when the deletion completed.</returns>
+        /// <response code="200">Returns true.</response>
+        /// <response code="400">If the assignmentRuleId is missing or invalid.</response>
+        [HttpDelete("assignments/{assignmentRuleId}")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> DeleteAssignmentRule(string assignmentRuleId)
+        {
+            if (string.IsNullOrEmpty(assignmentRuleId))
+                return BadRequest(new { Message = "assignmentRuleId is empty." });
+
+            var auditUser = HttpContext.GetUserId();
+
+            return _service.DeleteAssignmentRule(assignmentRuleId, auditUser);
+        }
     }
 }

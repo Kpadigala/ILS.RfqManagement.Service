@@ -10,5 +10,13 @@ namespace ILS.RfqManagement.DomainModel.Contracts.Repositories
         void AddAdministrators(AddAdministratorsRequest request, string auditUser);
 
         void RemoveAdministrators(RemoveAdministratorsRequest request, string auditUser);
+
+        IEnumerable<AssignmentRuleSummary> GetAssignmentRules(string supplierCompanyId);
+
+        AssignmentRuleDetail GetAssignmentRule(string assignmentRuleId);
+
+        string SaveAssignmentRule(SaveAssignmentRuleRequest request, string auditUser);
+
+        void DeleteAssignmentRule(string assignmentRuleId, string auditUser);
     }
 }

@@ -31,5 +31,27 @@ namespace ILS.RfqManagement.Services
             _repository.RemoveAdministrators(request, auditUser);
             return true;
         }
+
+        public IEnumerable<AssignmentRuleSummary> GetAssignmentRules(string supplierCompanyId)
+        {
+            return _repository.GetAssignmentRules(supplierCompanyId);
+        }
+
+        public AssignmentRuleDetail GetAssignmentRule(string assignmentRuleId)
+        {
+            return _repository.GetAssignmentRule(assignmentRuleId);
+        }
+
+        public AssignmentRuleDetail SaveAssignmentRule(SaveAssignmentRuleRequest request, string auditUser)
+        {
+            var assignmentRuleId = _repository.SaveAssignmentRule(request, auditUser);
+            return _repository.GetAssignmentRule(assignmentRuleId);
+        }
+
+        public bool DeleteAssignmentRule(string assignmentRuleId, string auditUser)
+        {
+            _repository.DeleteAssignmentRule(assignmentRuleId, auditUser);
+            return true;
+        }
     }
 }

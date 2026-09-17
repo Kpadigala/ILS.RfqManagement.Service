@@ -62,6 +62,93 @@ namespace ILS.RfqManagement.Repositories
                 new { });
         }
 
+        public IEnumerable<AssignmentRuleSummary> GetAssignmentRules(string supplierCompanyId)
+        {
+            using var cn = _connectionFactory.Connection;
+            return cn.Query<AssignmentRuleSummary>(
+                "RFQ.pkgRFQManagement.spGetAssignmentRules",
+                new { insuppliercompanyid = supplierCompanyId },
+                new { outrules = RefCursor.Value }).ToList();
+        }
+
+        public AssignmentRuleDetail GetAssignmentRule(string assignmentRuleId)
+        {
+            using var cn = _connectionFactory.Connection;
+            var result = cn.QueryMultiple(
+                "RFQ.pkgRFQManagement.spGetAssignmentRule",
+                new { inassignmentruleid = assignmentRuleId },
+                new
+                {
+                    outrule = RefCursor.Value,
+                    outcriteria = RefCursor.Value,
+                    outescalation = RefCursor.Value
+                });
+
+            var rule = result.Read<AssignmentRuleDetail>().SingleOrDefault();
+            if (rule == null)
+                return null;
+
+            rule.Criteria = result.Read<AssignmentCriteriaItem>().ToList();
+            rule.Escalation = result.Read<AssignmentEscalation>().SingleOrDefault();
+
+            return rule;
+        }
+
+        public string SaveAssignmentRule(SaveAssignmentRuleRequest request, string auditUser)
+        {
+            var partNumbers = (Clob)JsonConvert.SerializeObject(request.PartNumbers ?? Enumerable.Empty<string>());
+            var companies = (Clob)JsonConvert.SerializeObject((request.Companies ?? Enumerable.Empty<AssignmentCriteriaItem>())
+                .Select(c => new { companyId = c.CriteriaCode, companyName = c.CriteriaLabel }));
+            var regions = (Clob)JsonConvert.SerializeObject((request.Regions ?? Enumerable.Empty<AssignmentCriteriaItem>())
+                .Select(r => new { regionId = r.CriteriaCode, regionName = r.CriteriaLabel, countryCd = r.CountryCd }));
+            var escalation = request.Escalation;
+
+            using var cn = _connectionFactory.Connection;
+            var result = cn.ExecuteScalar(
+                "RFQ.pkgRFQManagement.spSaveAssignmentRule",
+                new
+                {
+                    inassignmentruleid = request.AssignmentRuleId,
+                    insuppliercompanyid = request.SupplierCompanyId,
+                    inassigntocompanyid = request.AssignToCompanyId,
+                    inadministratorid = request.AdministratorId,
+                    inpartnumbers = partNumbers,
+                    incompanies = companies,
+                    inregions = regions,
+                    inescalationenabled = escalation != null ? (escalation.EscalationEnabled ? 1 : 0) : (int?)null,
+                    inescalationadministratorid = escalation?.EscalationAdministratorId,
+                    instarttime = escalation?.StartTime,
+                    inendtime = escalation?.EndTime,
+                    intimezone = escalation?.TimeZone,
+                    innotifybyemail = escalation != null ? (escalation.NotifyByEmail ? 1 : 0) : (int?)null,
+                    inmon = escalation != null ? (escalation.Mon ? 1 : 0) : (int?)null,
+                    intue = escalation != null ? (escalation.Tue ? 1 : 0) : (int?)null,
+                    inwed = escalation != null ? (escalation.Wed ? 1 : 0) : (int?)null,
+                    inthu = escalation != null ? (escalation.Thu ? 1 : 0) : (int?)null,
+                    infri = escalation != null ? (escalation.Fri ? 1 : 0) : (int?)null,
+                    insat = escalation != null ? (escalation.Sat ? 1 : 0) : (int?)null,
+                    insun = escalation != null ? (escalation.Sun ? 1 : 0) : (int?)null,
+                    inaudituser = auditUser
+                },
+                new { outassignmentruleid = OutputParameter.Make<string>(size: 36) })
+                .Get<string>("outassignmentruleid");
+
+            return result;
+        }
+
+        public void DeleteAssignmentRule(string assignmentRuleId, string auditUser)
+        {
+            using var cn = _connectionFactory.Connection;
+            cn.ExecuteScalar(
+                "RFQ.pkgRFQManagement.spDeleteAssignmentRule",
+                new
+                {
+                    inassignmentruleid = assignmentRuleId,
+                    inaudituser = auditUser
+                },
+                new { });
+        }
+
         private static IEnumerable<AdministratorDetail> MapToDetails(IEnumerable<AdministratorRow> rows)
         {
             return rows.Select(row => new AdministratorDetail
