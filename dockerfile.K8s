@@ -1,0 +1,62 @@
+# escape=`
+
+FROM  int-dtr.ilsmart.com/ils/sdk80-pwsh-linux AS build
+SHELL ["pwsh", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
+ARG BUILD=CI
+WORKDIR /devOps
+COPY ./ConnectionStrings/connectionstrings.json ./connectionstrings/
+COPY ./ApplicationConfiguration/ ./ApplicationConfiguration/
+# install application dependencies
+WORKDIR /ILS.RfqManagement.Service
+
+# configure nuget
+COPY ./BuildAndDeployment/Dotnet/nuget.config .
+COPY ./BuildAndDeployment/ILS_Root_CA.pem .
+RUN $CertificateObject = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2 -ArgumentList "./ILS_Root_CA.pem"; `
+	$CertStore = New-Object System.Security.Cryptography.X509Certificates.X509Store -ArgumentList "Root", CurrentUser; `
+	$CertStore.Open('ReadWrite'); `
+	$CertStore.Add($CertificateObject);
+
+
+# copy src
+COPY . .
+WORKDIR /ILS.RfqManagement.Service/ILS.RfqManagement.Endpoints
+# restore
+RUN dotnet restore --configfile ../nuget.config
+
+# unit tests
+WORKDIR /ILS.RfqManagement.Service/ILS.RfqManagement.Tests
+RUN if ($env:BUILD -eq 'CI'){ `
+ dotnet tool install dotnet-reportgenerator-globaltool --version 5.3.11 --tool-path /dotnetglobaltools;  `
+ dotnet test ILS.RfqManagement.Tests.csproj --logger trx /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutputDirectory=/testresults/coverage/ /p:TotalThreshold=90;`
+ /dotnetglobaltools/reportgenerator "-reports:coverage.cobertura.xml" "-targetdir:testresults/reports" "-reporttypes:HTMLInline";`
+ }
+ 
+# Integration tests
+WORKDIR /ILS.RfqManagement.Service
+RUN (invoke-webrequest http://svn.ilsmart.com/Databases/Trunk/Tools/tnsnames.ora).Content | Set-Content -path .\tnsnames.ora
+RUN if ($env:BUILD -eq 'CI'){ `
+  dotnet build; `
+  Copy-Item tnsnames.ora ./ILS.RfqManagement.IntegrationTests/bin/Debug/net8.0/;`
+  dotnet test ILS.RfqManagement.IntegrationTests/ILS.RfqManagement.IntegrationTests.csproj --logger:trx; exit 0` 
+}
+
+# publish
+FROM build AS release
+WORKDIR /ILS.RfqManagement.Service
+RUN dotnet publish ILS.RfqManagement.Endpoints/ILS.RfqManagement.Endpoints.csproj -c Release -o ../publish
+RUN (invoke-webrequest http://svn.ilsmart.com/Databases/Trunk/Tools/tnsnames.ora).Content | Set-Content -path .\tnsnames.ora
+RUN Copy-Item tnsnames.ora ../publish
+
+
+# create runtime image for deployment
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+#USER ContainerAdministrator
+WORKDIR /publish
+COPY --from=release /publish/ .
+ARG PORT=7210
+ENV PORT=$PORT
+EXPOSE $PORT
+ENV ASPNETCORE_URLS=http://*:$PORT
+HEALTHCHECK CMD curl --fail http://localhost:$PORT/liveness || exit 1
+ENTRYPOINT ["dotnet", "ILS.RfqManagement.Endpoints.dll"]	

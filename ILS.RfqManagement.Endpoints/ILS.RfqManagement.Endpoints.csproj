@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<NoWarn>1591</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<NoWarn>1591</NoWarn>
+	</PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ILS.ConnectionStrings.Client" Version="8.0.1" />
+    <PackageReference Include="ILS.Exceptions.Middleware" Version="8.0.1" />
+    <PackageReference Include="ILS.Extensions" Version="8.0.10" />
+    <PackageReference Include="ILS.HealthChecks" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Cors" Version="2.3.0" />
+	<PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="8.1.1" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="8.1.1" />
+	<PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="8.1.1" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ILS.RfqManagement.DomainModel\ILS.RfqManagement.DomainModel.csproj" />
+    <ProjectReference Include="..\ILS.RfqManagement.Repositories\ILS.RfqManagement.Repositories.csproj" />
+    <ProjectReference Include="..\ILS.RfqManagement.Services\ILS.RfqManagement.Services.csproj" />
+  </ItemGroup>
+
+</Project>

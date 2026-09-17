@@ -1,0 +1,39 @@
+{
+    "iisSettings": {
+        "windowsAuthentication": false,
+        "anonymousAuthentication": true,
+        "launchBrowser": true,
+        "launchUrl": "apidocs",
+        "iisExpress": {
+            "applicationUrl": "http://localhost:7210/",
+            "sslPort": 0
+        }
+    },
+  "profiles": {
+    "IIS Express": {
+        "commandName": "IISExpress",
+        "launchBrowser": true,
+        "launchUrl": "apidocs",
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development"
+        }
+    },
+    "Localhost": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:7210"
+    },
+    "MachineName": {
+        "commandName": "Project",
+        "launchBrowser": true,
+        "launchUrl": "apidocs",
+        "environmentVariables": {
+            "ASPNETCORE_ENVIRONMENT": "Development",
+            "LAUNCH_PROFILE": "MachineName"
+        },
+        "applicationUrl": "https://%computername%.ilsdev.lan:7210/"
+    }
+  }
+}

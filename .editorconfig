@@ -1,0 +1,227 @@
+root = true
+
+[*.cs]
+
+# One public type per file (BLOCKING — error)
+dotnet_diagnostic.SA1402.severity = warning
+dotnet_diagnostic.SA1649.severity = warning
+
+# Suppress StyleCop rules that conflict with ILS conventions
+# PrefixLocalCallsWithThis - we don't use 'this.'
+dotnet_diagnostic.SA1101.severity = none
+# UsingDirectivesMustBePlacedCorrectly - we use file-scoped namespaces with usings outside
+dotnet_diagnostic.SA1200.severity = none
+# FieldNamesMustNotBeginWithUnderscore - we use _camelCase (the inverse rule; stays none)
+dotnet_diagnostic.SA1309.severity = none
+# UseTrailingCommasInMultiLineInitializers - not an ILS convention
+dotnet_diagnostic.SA1413.severity = none
+
+# Private fields MUST be _camelCase (instance, static, readonly, static readonly, const) — code-quality-canon.md "Naming conventions table".
+# The explicit dotnet_diagnostic.IDE1006.severity line is REQUIRED: the dotnet_naming_rule.*.severity setting alone is NOT
+# surfaced at command-line build under EnforceCodeStyleInBuild (verified, SDK 9.0.100) — without it the rule is silently inert.
+dotnet_diagnostic.IDE1006.severity = warning
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.style = underscore_camel_case
+dotnet_naming_rule.private_fields_underscore.severity = warning
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_style.underscore_camel_case.capitalization = camel_case
+dotnet_naming_style.underscore_camel_case.required_prefix = _
+# FileMustHaveHeader - we don't use file headers
+dotnet_diagnostic.SA1633.severity = none
+# PropertySummaryDocumentationMustMatchAccessors - too prescriptive
+dotnet_diagnostic.SA1623.severity = none
+# BracesShouldNotBeOmitted - allow single-line statements without braces
+dotnet_diagnostic.SA1503.severity = none
+# ElementsMustBeDocumented - not required on all elements
+dotnet_diagnostic.SA1600.severity = none
+# ElementParametersDocumented - extension method params (especially 'self') don't require docs
+dotnet_diagnostic.SA1611.severity = none
+# ElementReturnValueDocumented - return value docs optional for self-explanatory methods
+dotnet_diagnostic.SA1615.severity = suggestion
+
+# Test method naming uses underscores (Method_When_Should convention)
+dotnet_diagnostic.CA1707.severity = none
+
+# Type name reserved suffix (TestClientCollection intentional)
+dotnet_diagnostic.CA1711.severity = none
+
+# Public types in application assemblies are intentional (API surface, DI registration)
+dotnet_diagnostic.CA1515.severity = none
+
+# Namespace-folder mismatch (ILS uses src/ in path but excludes from namespace)
+dotnet_diagnostic.IDE0130.severity = none
+
+# File-scoped namespaces (ILS convention)
+dotnet_diagnostic.IDE0160.severity = none
+
+# DTO types use string URLs and List<T> per frontend API spec
+dotnet_diagnostic.CA1056.severity = none
+dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.CA2227.severity = none
+
+# Culture-sensitivity: ILS services use invariant culture consistently — locale variance not a concern
+dotnet_diagnostic.CA1304.severity = suggestion
+dotnet_diagnostic.CA1310.severity = suggestion
+dotnet_diagnostic.CA1311.severity = suggestion
+
+# StringComparison parameter — test code doesn't require explicit comparison specification
+dotnet_diagnostic.CA1307.severity = none
+
+# Parameter null validation — extension methods on reference types (self) don't require null checks
+dotnet_diagnostic.CA1062.severity = suggestion
+
+# ConfigureAwait — library code should use ConfigureAwait(false); suppressed per team standards
+dotnet_diagnostic.CA2007.severity = none
+
+# Type name conflicts with namespace — suggestion only; actual shadowing is unlikely on .NET 8 (System.Web.Profile is Framework-only)
+dotnet_diagnostic.CA1724.severity = suggestion
+
+# Nested types are internal unless intentionally public API (implementation details vs. public surface)
+dotnet_diagnostic.CA1034.severity = suggestion
+
+# Member ordering — SA1201 suggestion (fields must precede nested types); SA1204 suggestion only (ILS services often group by feature)
+dotnet_diagnostic.SA1201.severity = suggestion
+dotnet_diagnostic.SA1202.severity = none
+dotnet_diagnostic.SA1204.severity = suggestion
+
+# Using directive ordering — suggestion only; ILS services often order by logical grouping
+dotnet_diagnostic.SA1210.severity = suggestion
+# System namespaces before third-party - suppressed; ILS services order by logical grouping
+dotnet_diagnostic.SA1208.severity = none
+
+# Explicit variable types (no var requirement)
+dotnet_diagnostic.IDE0008.severity = none
+
+# Braces preference (allow omitted braces on single-line statements)
+dotnet_diagnostic.IDE0011.severity = none
+
+# Block body vs expression body — allow expression-bodied members
+dotnet_diagnostic.IDE0022.severity = none
+
+# Conditional expression simplification (allow explicit if/else)
+dotnet_diagnostic.IDE0046.severity = none
+
+# Use pattern matching (allow explicit is checks and casts)
+dotnet_diagnostic.IDE0039.severity = none
+
+# Use coalesce expression (?? operator)
+dotnet_diagnostic.IDE0074.severity = warning
+
+# Substring and new expression simplification (C# 8+ range operator, C# 9+ new())
+dotnet_diagnostic.IDE0057.severity = suggestion
+dotnet_diagnostic.IDE0090.severity = suggestion
+
+# Collection initialization style preference
+dotnet_diagnostic.IDE0028.severity = suggestion
+
+# Use collection expression (C# 12.0+)
+dotnet_diagnostic.IDE0300.severity = warning
+
+# Redundant cast
+dotnet_diagnostic.IDE0004.severity = warning
+
+# Dead-code rules from code-quality-canon.md
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE0051.severity = warning
+dotnet_diagnostic.IDE0052.severity = warning
+dotnet_diagnostic.IDE0059.severity = warning
+dotnet_diagnostic.IDE0060.severity = warning
+dotnet_diagnostic.CS0219.severity = warning
+dotnet_diagnostic.CS0162.severity = warning
+dotnet_diagnostic.CS8019.severity = warning
+# Avoid dead code (unreachable code paths, always-true/always-false conditions)
+dotnet_diagnostic.CA1508.severity = warning
+
+# Nullable reference types — CS8618 non-nullable uninitialized (valid in async init patterns, JSON DTOs)
+dotnet_diagnostic.CS8618.severity = warning
+
+# Nullable reference types — CS8601 possible null reference assignment
+dotnet_diagnostic.CS8601.severity = warning
+
+# IDisposable pattern — CA1816 Dispose should call GC.SuppressFinalize
+dotnet_diagnostic.CA1816.severity = warning
+
+# IDisposable pattern — CA1063 Implement IDisposable correctly (suppressed)
+dotnet_diagnostic.CA1063.severity = none
+
+# Uninstantiated internal class — CA1812 (test DTOs instantiated via JSON deserialization)
+dotnet_diagnostic.CA1812.severity = none
+
+# Type can be sealed — CA1852 (test types don't require sealing)
+dotnet_diagnostic.CA1852.severity = none
+
+# Static holder types should be sealed — CA1052 (Program entry point intentional)
+dotnet_diagnostic.CA1052.severity = none
+
+# Initialize reference type static fields inline — CA1810 (complex interdependent static field initialization justified in test fixtures)
+dotnet_diagnostic.CA1810.severity = none
+
+# Uri overload preference — CA2234 (string overloads acceptable in test code)
+dotnet_diagnostic.CA2234.severity = suggestion
+
+# Parameter type should be Uri — CA1054 (test methods use string with xUnit InlineData; Uri conversion breaks attribute binding)
+dotnet_diagnostic.CA1054.severity = none
+
+# Member can be made static — CA1822 (enforce static where possible)
+dotnet_diagnostic.CA1822.severity = warning
+
+# Expression value unused (Dapper Execute, fluent DI — intentional discards)
+dotnet_diagnostic.IDE0058.severity = suggestion
+
+# Whitespace rules from code-quality-canon.md
+dotnet_diagnostic.IDE2000.severity = warning
+dotnet_diagnostic.IDE2002.severity = warning
+dotnet_diagnostic.IDE0055.severity = warning
+
+# StyleCop formatting enforcement (harmless violations)
+# Use string.Empty instead of ""
+dotnet_diagnostic.SA1122.severity = warning
+# Single line comment should begin with a space
+dotnet_diagnostic.SA1005.severity = warning
+# Multiple blank lines
+dotnet_diagnostic.SA1507.severity = warning
+# Single-line comment should be preceded by blank line
+dotnet_diagnostic.SA1515.severity = warning
+# Use trailing blank line at end of file
+dotnet_diagnostic.SA1518.severity = warning
+
+# Brace placement preference — developer discretion for multi-line statements
+dotnet_diagnostic.SA1500.severity = suggestion
+
+# Single-line elements allowed (e.g., trivial marker/fixture classes)
+dotnet_diagnostic.SA1502.severity = none
+
+# Parameter placement — allow first param on same line as method call
+dotnet_diagnostic.SA1116.severity = none
+dotnet_diagnostic.SA1117.severity = none
+csharp_using_directive_placement = outside_namespace:silent
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_prefer_braces = true:silent
+csharp_style_namespace_declarations = block_scoped:silent
+csharp_style_prefer_method_group_conversion = true:silent
+csharp_style_prefer_top_level_statements = true:silent
+csharp_style_prefer_primary_constructors = true:suggestion
+csharp_prefer_system_threading_lock = true:suggestion
+csharp_style_expression_bodied_methods = false:silent
+csharp_style_expression_bodied_constructors = false:silent
+csharp_style_expression_bodied_operators = false:silent
+csharp_style_expression_bodied_properties = true:silent
+csharp_style_expression_bodied_indexers = true:silent
+csharp_style_expression_bodied_accessors = true:silent
+csharp_style_expression_bodied_lambdas = true:silent
+csharp_style_expression_bodied_local_functions = false:silent
+csharp_indent_labels = one_less_than_current
+
+[*.{cs,vb}]
+dotnet_style_coalesce_expression = true:suggestion
+dotnet_style_null_propagation = true:suggestion
+dotnet_style_prefer_is_null_check_over_reference_equality_method = true:suggestion
+dotnet_style_prefer_auto_properties = true:silent
+dotnet_style_object_initializer = true:suggestion
+dotnet_style_collection_initializer = true:suggestion
+dotnet_style_prefer_simplified_boolean_expressions = true:suggestion
+dotnet_style_operator_placement_when_wrapping = beginning_of_line
+tab_width = 4
+indent_size = 4
+end_of_line = crlf

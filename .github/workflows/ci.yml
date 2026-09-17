@@ -1,0 +1,27 @@
+name: CI
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  ado-ci:
+    name: ADO Classic CI
+    uses: camp-ils-applications/ci-workflows/.github/workflows/ado-ci-trigger.yml@v1
+    with:
+      definitionId: 237
+      project: ILS
+      org: "https://devops.ilsmart.com/DefaultCollection"
+      apiVersion: "6.0"
+      pollSeconds: 10
+      maxWaitMinutes: 15
+      runnerLabel: "X64"
+    secrets:
+      ADO_PAT: ${{ secrets.ADO_PAT }}

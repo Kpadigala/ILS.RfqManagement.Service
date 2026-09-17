@@ -1,0 +1,20 @@
+deployment:
+  name: ${deploymentName}
+  labels:
+    app: ${appName}
+  containers:
+    name: ${containerName}
+    image: ${Image}
+    env:
+      value: ${Environment}
+  port: ${port}
+  spec:
+    kubehost: ${kubeHost}
+    replicas: ${replicas}
+services:
+  name: ${serviceName}
+ingress:
+  name: ${ingressName}
+  rules:
+    hostname: ${hostName}
+  path: ${pathName}
