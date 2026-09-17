@@ -33,7 +33,7 @@ namespace ILS.RfqManagement.Repositories
 
         public void AddAdministrators(AddAdministratorsRequest request, string auditUser)
         {
-            var userIds = (Clob)JsonConvert.SerializeObject(request.AdminCompanyIds);
+            var companyIds = (Clob)JsonConvert.SerializeObject(request.AdminCompanyIds);
 
             using var cn = _connectionFactory.Connection;
             cn.ExecuteScalar(
@@ -41,7 +41,7 @@ namespace ILS.RfqManagement.Repositories
                 new
                 {
                     insuppliercompanyid = request.SupplierCompanyId,
-                    inuserids = userIds,
+                    incompanyids = companyIds,
                     inaudituser = auditUser
                 },
                 new { });
@@ -155,19 +155,19 @@ namespace ILS.RfqManagement.Repositories
             {
                 Id = row.AdministratorId,
                 SupplierCompanyId = row.SupplierCompanyId,
-                AdminCompanyId = row.UserId
+                AdminCompanyId = row.CompanyId
             }).ToList();
         }
 
         // Shape of the ref cursor returned by RFQ.pkgRFQManagement.spGetAdministrators
-        // ("administratorid", "suppliercompanyid", "userid").
+        // ("administratorid", "suppliercompanyid", "companyid").
         private class AdministratorRow
         {
             public string AdministratorId { get; set; }
 
             public string SupplierCompanyId { get; set; }
 
-            public string UserId { get; set; }
+            public string CompanyId { get; set; }
         }
     }
 }
