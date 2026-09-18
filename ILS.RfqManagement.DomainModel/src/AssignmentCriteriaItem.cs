@@ -27,7 +27,7 @@ namespace ILS.RfqManagement.DomainModel
         /// <value>
         /// The criteria label.
         /// </value>
-        public string CriteriaLabel { get; set; }
+        public string? CriteriaLabel { get; set; }
 
         /// <summary>
         /// Gets or sets the country code; only populated for REGION criteria.
@@ -35,6 +35,6 @@ namespace ILS.RfqManagement.DomainModel
         /// <value>
         /// The country code.
         /// </value>
-        public string CountryCd { get; set; }
+        public string? CountryCd { get; set; }
     }
 }
