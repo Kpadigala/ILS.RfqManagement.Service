@@ -13,7 +13,7 @@ namespace ILS.RfqManagement.DomainModel.Requests
         /// <value>
         /// The assignment rule identifier.
         /// </value>
-        public string AssignmentRuleId { get; set; }
+        public string? AssignmentRuleId { get; set; }
 
         /// <summary>
         /// Gets or sets the supplier company (Receiving ID) that owns this rule.
@@ -69,6 +69,6 @@ namespace ILS.RfqManagement.DomainModel.Requests
         /// <value>
         /// The escalation settings.
         /// </value>
-        public AssignmentEscalation Escalation { get; set; }
+        public AssignmentEscalation? Escalation { get; set; }
     }
 }
