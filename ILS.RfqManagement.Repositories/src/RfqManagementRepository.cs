@@ -89,7 +89,7 @@ namespace ILS.RfqManagement.Repositories
                 return null;
 
             rule.Criteria = result.Read<AssignmentCriteriaItem>().ToList();
-            rule.Escalation = result.Read<AssignmentEscalation>().SingleOrDefault();
+            rule.Escalation = MapToEscalation(result.Read<EscalationRow>().SingleOrDefault());
 
             return rule;
         }
@@ -117,8 +117,8 @@ namespace ILS.RfqManagement.Repositories
                     inregions = regions,
                     inescalationenabled = escalation != null ? (escalation.EscalationEnabled ? 1 : 0) : (int?)null,
                     inescalationadministratorid = escalation?.EscalationAdministratorId,
-                    instarttime = escalation?.StartTime,
-                    inendtime = escalation?.EndTime,
+                    instarttime = EscalationTimeConverter.ToMinutesSinceMidnight(escalation?.StartTime),
+                    inendtime = EscalationTimeConverter.ToMinutesSinceMidnight(escalation?.EndTime),
                     intimezone = escalation?.TimeZone,
                     innotifybyemail = escalation != null ? (escalation.NotifyByEmail ? 1 : 0) : (int?)null,
                     inmon = escalation != null ? (escalation.Mon ? 1 : 0) : (int?)null,
@@ -159,6 +159,29 @@ namespace ILS.RfqManagement.Repositories
             }).ToList();
         }
 
+        private static AssignmentEscalation MapToEscalation(EscalationRow row)
+        {
+            if (row == null)
+                return null;
+
+            return new AssignmentEscalation
+            {
+                EscalationEnabled = row.EscalationEnabled,
+                EscalationAdministratorId = row.EscalationAdministratorId,
+                StartTime = EscalationTimeConverter.ToTimeString(row.StartTime),
+                EndTime = EscalationTimeConverter.ToTimeString(row.EndTime),
+                TimeZone = row.TimeZone,
+                NotifyByEmail = row.NotifyByEmail,
+                Mon = row.Mon,
+                Tue = row.Tue,
+                Wed = row.Wed,
+                Thu = row.Thu,
+                Fri = row.Fri,
+                Sat = row.Sat,
+                Sun = row.Sun
+            };
+        }
+
         // Shape of the ref cursor returned by RFQ.pkgRFQManagement.spGetAdministrators
         // ("administratorid", "suppliercompanyid", "companyid").
         private class AdministratorRow
@@ -168,6 +191,37 @@ namespace ILS.RfqManagement.Repositories
             public string SupplierCompanyId { get; set; }
 
             public string CompanyId { get; set; }
+        }
+
+        // Shape of the outescalation ref cursor returned by RFQ.pkgRFQManagement.spGetAssignmentRule.
+        // starttime/endtime are stored as minutes since midnight (0-1439), not a formatted time string.
+        private class EscalationRow
+        {
+            public bool EscalationEnabled { get; set; }
+
+            public string EscalationAdministratorId { get; set; }
+
+            public int? StartTime { get; set; }
+
+            public int? EndTime { get; set; }
+
+            public string TimeZone { get; set; }
+
+            public bool NotifyByEmail { get; set; }
+
+            public bool Mon { get; set; }
+
+            public bool Tue { get; set; }
+
+            public bool Wed { get; set; }
+
+            public bool Thu { get; set; }
+
+            public bool Fri { get; set; }
+
+            public bool Sat { get; set; }
+
+            public bool Sun { get; set; }
         }
     }
 }
