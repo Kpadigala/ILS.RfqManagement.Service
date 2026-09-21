@@ -18,5 +18,15 @@ namespace ILS.RfqManagement.DomainModel.Contracts.Services
         AssignmentRuleDetail SaveAssignmentRule(SaveAssignmentRuleRequest request, string auditUser);
 
         bool DeleteAssignmentRule(string assignmentRuleId, string auditUser);
+
+        IEnumerable<ManualAssignment> GetManualAssignments(string rfqId);
+
+        IEnumerable<ManualAssignment> InsManualAssignments(InsManualAssignmentsRequest request, string auditUser);
+
+        IEnumerable<ManualAssignment> DeleteManualAssignments(DeleteManualAssignmentsRequest request, string auditUser);
+
+        IEnumerable<string> GetAssignedAdministrators(string supplierCompanyId, string rfqId);
+
+        bool MatchNewRfqToAssignmentRules(MatchNewRfqToAssignmentRulesRequest request, string auditUser);
     }
 }

@@ -53,5 +53,33 @@ namespace ILS.RfqManagement.Services
             _repository.DeleteAssignmentRule(assignmentRuleId, auditUser);
             return true;
         }
+
+        public IEnumerable<ManualAssignment> GetManualAssignments(string rfqId)
+        {
+            return _repository.GetManualAssignments(rfqId);
+        }
+
+        public IEnumerable<ManualAssignment> InsManualAssignments(InsManualAssignmentsRequest request, string auditUser)
+        {
+            _repository.InsManualAssignments(request, auditUser);
+            return _repository.GetManualAssignments(request.RfqId);
+        }
+
+        public IEnumerable<ManualAssignment> DeleteManualAssignments(DeleteManualAssignmentsRequest request, string auditUser)
+        {
+            _repository.DeleteManualAssignments(request, auditUser);
+            return _repository.GetManualAssignments(request.RfqId);
+        }
+
+        public IEnumerable<string> GetAssignedAdministrators(string supplierCompanyId, string rfqId)
+        {
+            return _repository.GetAssignedAdministrators(supplierCompanyId, rfqId);
+        }
+
+        public bool MatchNewRfqToAssignmentRules(MatchNewRfqToAssignmentRulesRequest request, string auditUser)
+        {
+            _repository.MatchNewRfqToAssignmentRules(request, auditUser);
+            return true;
+        }
     }
 }

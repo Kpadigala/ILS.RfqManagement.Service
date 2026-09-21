@@ -174,5 +174,123 @@ namespace ILS.RfqManagement.Endpoints.Controllers
 
             return _service.DeleteAssignmentRule(assignmentRuleId, auditUser);
         }
+
+        /// <summary>
+        /// Retrieves the manual assignments for an RFQ.
+        /// </summary>
+        /// <param name="rfqId">The RFQ identifier.</param>
+        /// <returns>The RFQ's manual assignments.</returns>
+        /// <response code="200">Returns the manual assignments.</response>
+        /// <response code="400">If the rfqId is missing or invalid.</response>
+        [HttpGet("manualAssignments/{rfqId}")]
+        [ProducesResponseType(typeof(IEnumerable<ManualAssignment>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<ManualAssignment>> GetManualAssignments(string rfqId)
+        {
+            if (string.IsNullOrEmpty(rfqId))
+                return BadRequest(new { Message = "rfqId is empty." });
+
+            return _service.GetManualAssignments(rfqId).ToList();
+        }
+
+        /// <summary>
+        /// Replaces the manual assignments for an RFQ and supplier company with the supplied set of companies.
+        /// </summary>
+        /// <param name="request">The RFQ, supplier company, and companies to manually assign.</param>
+        /// <returns>The resulting manual assignments for the RFQ.</returns>
+        /// <response code="200">Returns the resulting manual assignments.</response>
+        /// <response code="400">If the request is invalid.</response>
+        [HttpPost("manualAssignments")]
+        [ProducesResponseType(typeof(IEnumerable<ManualAssignment>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<ManualAssignment>> InsManualAssignments([FromBody] InsManualAssignmentsRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.RfqId))
+                return BadRequest(new { Message = "RfqId is empty." });
+
+            if (string.IsNullOrEmpty(request.SupplierCompanyId))
+                return BadRequest(new { Message = "SupplierCompanyId is empty." });
+
+            if (request.AssignToCompanyIds == null)
+                return BadRequest(new { Message = "AssignToCompanyIds is empty." });
+
+            var auditUser = HttpContext.GetUserId();
+
+            return _service.InsManualAssignments(request, auditUser).ToList();
+        }
+
+        /// <summary>
+        /// Removes specific manual assignments for an RFQ and supplier company.
+        /// </summary>
+        /// <param name="request">The RFQ, supplier company, and companies to remove the manual assignment for.</param>
+        /// <returns>The resulting manual assignments for the RFQ.</returns>
+        /// <response code="200">Returns the resulting manual assignments.</response>
+        /// <response code="400">If the request is invalid.</response>
+        [HttpPost("manualAssignments/remove")]
+        [ProducesResponseType(typeof(IEnumerable<ManualAssignment>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<ManualAssignment>> DeleteManualAssignments([FromBody] DeleteManualAssignmentsRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.RfqId))
+                return BadRequest(new { Message = "RfqId is empty." });
+
+            if (string.IsNullOrEmpty(request.SupplierCompanyId))
+                return BadRequest(new { Message = "SupplierCompanyId is empty." });
+
+            if (request.AssignToCompanyIds == null)
+                return BadRequest(new { Message = "AssignToCompanyIds is empty." });
+
+            var auditUser = HttpContext.GetUserId();
+
+            return _service.DeleteManualAssignments(request, auditUser).ToList();
+        }
+
+        /// <summary>
+        /// Retrieves the administrators with an active assignment for an RFQ.
+        /// </summary>
+        /// <param name="supplierCompanyId">The supplier company identifier.</param>
+        /// <param name="rfqId">The RFQ identifier.</param>
+        /// <returns>The assigned administrator ids.</returns>
+        /// <response code="200">Returns the assigned administrator ids.</response>
+        /// <response code="400">If supplierCompanyId or rfqId is missing or invalid.</response>
+        [HttpGet("assignedAdministrators/{supplierCompanyId}/{rfqId}")]
+        [ProducesResponseType(typeof(IEnumerable<string>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<string>> GetAssignedAdministrators(string supplierCompanyId, string rfqId)
+        {
+            if (string.IsNullOrEmpty(supplierCompanyId))
+                return BadRequest(new { Message = "supplierCompanyId is empty." });
+
+            if (string.IsNullOrEmpty(rfqId))
+                return BadRequest(new { Message = "rfqId is empty." });
+
+            return _service.GetAssignedAdministrators(supplierCompanyId, rfqId).ToList();
+        }
+
+        /// <summary>
+        /// Matches a newly-created RFQ against active assignment rules for its recipient supplier company.
+        /// </summary>
+        /// <param name="request">The new RFQ's details to match against assignment rules.</param>
+        /// <returns>True when matching completed.</returns>
+        /// <response code="200">Returns true.</response>
+        /// <response code="400">If the request is invalid.</response>
+        [HttpPost("matchNewRfqToAssignmentRules")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> MatchNewRfqToAssignmentRules([FromBody] MatchNewRfqToAssignmentRulesRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.RfqId))
+                return BadRequest(new { Message = "RfqId is empty." });
+
+            if (string.IsNullOrEmpty(request.SupplierCompanyId))
+                return BadRequest(new { Message = "SupplierCompanyId is empty." });
+
+            if (string.IsNullOrEmpty(request.BuyerCompanyId))
+                return BadRequest(new { Message = "BuyerCompanyId is empty." });
+
+            var auditUser = HttpContext.GetUserId();
+
+            return _service.MatchNewRfqToAssignmentRules(request, auditUser);
+        }
     }
 }

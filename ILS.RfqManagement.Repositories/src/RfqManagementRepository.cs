@@ -149,6 +149,79 @@ namespace ILS.RfqManagement.Repositories
                 new { });
         }
 
+        public IEnumerable<ManualAssignment> GetManualAssignments(string rfqId)
+        {
+            using var cn = _connectionFactory.Connection;
+            return cn.Query<ManualAssignment>(
+                "RFQ.pkgRFQManagement.spGetManualAssignments",
+                new { inrfqid = rfqId },
+                new { outassignments = RefCursor.Value }).ToList();
+        }
+
+        public void InsManualAssignments(InsManualAssignmentsRequest request, string auditUser)
+        {
+            var assignToCompanyIds = (Clob)JsonConvert.SerializeObject(request.AssignToCompanyIds ?? Enumerable.Empty<string>());
+
+            using var cn = _connectionFactory.Connection;
+            cn.ExecuteScalar(
+                "RFQ.pkgRFQManagement.spInsManualAssignments",
+                new
+                {
+                    inrfqid = request.RfqId,
+                    insuppliercompanyid = request.SupplierCompanyId,
+                    inassigntocompanyids = assignToCompanyIds,
+                    inadministratorid = request.AdministratorId,
+                    inaudituser = auditUser
+                },
+                new { });
+        }
+
+        public void DeleteManualAssignments(DeleteManualAssignmentsRequest request, string auditUser)
+        {
+            var assignToCompanyIds = (Clob)JsonConvert.SerializeObject(request.AssignToCompanyIds ?? Enumerable.Empty<string>());
+
+            using var cn = _connectionFactory.Connection;
+            cn.ExecuteScalar(
+                "RFQ.pkgRFQManagement.spDeleteManualAssignments",
+                new
+                {
+                    inrfqid = request.RfqId,
+                    insuppliercompanyid = request.SupplierCompanyId,
+                    inassigntocompanyids = assignToCompanyIds,
+                    inaudituser = auditUser
+                },
+                new { });
+        }
+
+        public IEnumerable<string> GetAssignedAdministrators(string supplierCompanyId, string rfqId)
+        {
+            using var cn = _connectionFactory.Connection;
+            return cn.Query<string>(
+                "RFQ.pkgRFQManagement.spGetAssignedAdministrators",
+                new { insuppliercompanyid = supplierCompanyId, inrfqid = rfqId },
+                new { outassigned = RefCursor.Value }).ToList();
+        }
+
+        public void MatchNewRfqToAssignmentRules(MatchNewRfqToAssignmentRulesRequest request, string auditUser)
+        {
+            var partNumbers = (Clob)JsonConvert.SerializeObject(request.PartNumbers ?? Enumerable.Empty<string>());
+
+            using var cn = _connectionFactory.Connection;
+            cn.ExecuteScalar(
+                "RFQ.pkgRFQManagement.spMatchNewRfqToAssignmentRules",
+                new
+                {
+                    inrfqid = request.RfqId,
+                    insuppliercompanyid = request.SupplierCompanyId,
+                    inbuyercompanyid = request.BuyerCompanyId,
+                    inpartnumbers = partNumbers,
+                    inregionid = request.RegionId,
+                    inrfqtypecd = request.RfqTypeCd,
+                    inaudituser = auditUser
+                },
+                new { });
+        }
+
         private static IEnumerable<AdministratorDetail> MapToDetails(IEnumerable<AdministratorRow> rows)
         {
             return rows.Select(row => new AdministratorDetail
