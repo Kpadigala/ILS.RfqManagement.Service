@@ -54,7 +54,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 #USER ContainerAdministrator
 WORKDIR /publish
 COPY --from=release /publish/ .
-ARG PORT=7210
+ARG PORT=7240
 ENV PORT=$PORT
 EXPOSE $PORT
 ENV ASPNETCORE_URLS=http://*:$PORT

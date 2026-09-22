@@ -5,7 +5,7 @@
         "launchBrowser": true,
         "launchUrl": "apidocs",
         "iisExpress": {
-            "applicationUrl": "http://localhost:7210/",
+            "applicationUrl": "http://localhost:7240/",
             "sslPort": 0
         }
     },
@@ -23,7 +23,7 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:7210"
+      "applicationUrl": "http://localhost:7240"
     },
     "MachineName": {
         "commandName": "Project",
@@ -33,7 +33,7 @@
             "ASPNETCORE_ENVIRONMENT": "Development",
             "LAUNCH_PROFILE": "MachineName"
         },
-        "applicationUrl": "https://%computername%.ilsdev.lan:7210/"
+        "applicationUrl": "https://%computername%.ilsdev.lan:7240/"
     }
   }
 }

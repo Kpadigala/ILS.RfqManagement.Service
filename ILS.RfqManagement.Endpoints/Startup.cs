@@ -54,7 +54,7 @@ namespace ILS.RfqManagement.Endpoints
         public void ConfigureServices(IServiceCollection services)
         {
 #if DEBUG
-            const string myServicePort = "7210";
+            const string myServicePort = "7240";
             var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
             var processId = Environment.ProcessId;
 
