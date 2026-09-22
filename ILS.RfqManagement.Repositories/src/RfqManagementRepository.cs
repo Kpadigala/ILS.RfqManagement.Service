@@ -215,7 +215,6 @@ namespace ILS.RfqManagement.Repositories
                     insuppliercompanyid = request.SupplierCompanyId,
                     inbuyercompanyid = request.BuyerCompanyId,
                     inpartnumbers = partNumbers,
-                    inregionid = request.RegionId,
                     inrfqtypecd = request.RfqTypeCd,
                     inaudituser = auditUser
                 },

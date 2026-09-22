@@ -40,15 +40,6 @@ namespace ILS.RfqManagement.DomainModel.Requests
         public IEnumerable<string> PartNumbers { get; set; }
 
         /// <summary>
-        /// Gets or sets the buyer company's resolved region identifier. Null when the buyer has no
-        /// resolvable 'CA' address on file.
-        /// </summary>
-        /// <value>
-        /// The region identifier.
-        /// </value>
-        public string? RegionId { get; set; }
-
-        /// <summary>
         /// Gets or sets the RFQ type code.
         /// </summary>
         /// <value>
