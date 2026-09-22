@@ -268,9 +268,11 @@ namespace ILS.RfqManagement.Endpoints.Controllers
         }
 
         /// <summary>
-        /// Matches a newly-created RFQ against active assignment rules for its recipient supplier company.
+        /// Matches one RFQ against active assignment rules for its recipient supplier company. Not the
+        /// automatic trigger for a newly-created RFQ -- that runs via the RFQ.RFQMATCHPENDINGRFQS scheduler
+        /// job (see the RFQ Assignment Architecture decision memo, 2026-09-09). Useful for a manual re-match.
         /// </summary>
-        /// <param name="request">The new RFQ's details to match against assignment rules.</param>
+        /// <param name="request">The RFQ's details to match against assignment rules.</param>
         /// <returns>True when matching completed.</returns>
         /// <response code="200">Returns true.</response>
         /// <response code="400">If the request is invalid.</response>
