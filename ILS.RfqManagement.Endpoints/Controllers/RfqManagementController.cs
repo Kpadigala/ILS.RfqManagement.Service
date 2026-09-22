@@ -268,9 +268,10 @@ namespace ILS.RfqManagement.Endpoints.Controllers
         }
 
         /// <summary>
-        /// Matches one RFQ against active assignment rules for its recipient supplier company. Not the
-        /// automatic trigger for a newly-created RFQ -- that runs via the RFQ.RFQMATCHPENDINGRFQS scheduler
-        /// job (see the RFQ Assignment Architecture decision memo, 2026-09-09). Useful for a manual re-match.
+        /// Matches one RFQ against active assignment rules for its recipient supplier company. Called by the
+        /// RFQ Assignment matching batch application once per pending RFQ/supplier pair returned by
+        /// pendingRfqMatches (see the RFQ Assignment Architecture decision memo, 2026-09-09) -- also useful
+        /// standalone for a manual re-match.
         /// </summary>
         /// <param name="request">The RFQ's details to match against assignment rules.</param>
         /// <returns>True when matching completed.</returns>
@@ -293,6 +294,38 @@ namespace ILS.RfqManagement.Endpoints.Controllers
             var auditUser = HttpContext.GetUserId();
 
             return _service.MatchNewRfqToAssignmentRules(request, auditUser);
+        }
+
+        /// <summary>
+        /// Retrieves every RFQ/supplier pair still awaiting assignment-rule matching. Polled by the RFQ
+        /// Assignment matching batch application.
+        /// </summary>
+        /// <returns>The pending RFQ/supplier matches.</returns>
+        /// <response code="200">Returns the pending matches.</response>
+        [HttpGet("pendingRfqMatches")]
+        [ProducesResponseType(typeof(IEnumerable<PendingRfqMatch>), StatusCodes.Status200OK)]
+        public ActionResult<IEnumerable<PendingRfqMatch>> GetPendingRfqMatches()
+        {
+            return _service.GetPendingRfqMatches().ToList();
+        }
+
+        /// <summary>
+        /// Marks an RFQ as done matching, once every supplier returned for it by pendingRfqMatches has been
+        /// matched successfully. Called by the RFQ Assignment matching batch application.
+        /// </summary>
+        /// <param name="rfqId">The RFQ identifier.</param>
+        /// <returns>True when the update completed.</returns>
+        /// <response code="200">Returns true.</response>
+        /// <response code="400">If the rfqId is missing or invalid.</response>
+        [HttpPost("pendingRfqMatches/{rfqId}/clear")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> ClearPendingRfqMatch(string rfqId)
+        {
+            if (string.IsNullOrEmpty(rfqId))
+                return BadRequest(new { Message = "rfqId is empty." });
+
+            return _service.ClearPendingRfqMatch(rfqId);
         }
     }
 }

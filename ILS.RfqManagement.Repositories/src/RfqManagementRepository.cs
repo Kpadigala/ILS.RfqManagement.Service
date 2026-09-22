@@ -221,6 +221,24 @@ namespace ILS.RfqManagement.Repositories
                 new { });
         }
 
+        public IEnumerable<PendingRfqMatch> GetPendingRfqMatches()
+        {
+            using var cn = _connectionFactory.Connection;
+            return cn.Query<PendingRfqMatch>(
+                "RFQ.pkgRFQManagement.spGetPendingRfqMatches",
+                new { },
+                new { outpendingmatches = RefCursor.Value }).ToList();
+        }
+
+        public void ClearPendingRfqMatch(string rfqId)
+        {
+            using var cn = _connectionFactory.Connection;
+            cn.ExecuteScalar(
+                "RFQ.pkgRFQManagement.spClearPendingRfqMatch",
+                new { inrfqid = rfqId },
+                new { });
+        }
+
         private static IEnumerable<AdministratorDetail> MapToDetails(IEnumerable<AdministratorRow> rows)
         {
             return rows.Select(row => new AdministratorDetail

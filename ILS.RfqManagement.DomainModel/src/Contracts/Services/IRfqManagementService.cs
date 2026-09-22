@@ -28,5 +28,9 @@ namespace ILS.RfqManagement.DomainModel.Contracts.Services
         IEnumerable<string> GetAssignedAdministrators(string supplierCompanyId, string rfqId);
 
         bool MatchNewRfqToAssignmentRules(MatchNewRfqToAssignmentRulesRequest request, string auditUser);
+
+        IEnumerable<PendingRfqMatch> GetPendingRfqMatches();
+
+        bool ClearPendingRfqMatch(string rfqId);
     }
 }

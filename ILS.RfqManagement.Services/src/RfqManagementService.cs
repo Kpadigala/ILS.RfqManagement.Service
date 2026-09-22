@@ -81,5 +81,16 @@ namespace ILS.RfqManagement.Services
             _repository.MatchNewRfqToAssignmentRules(request, auditUser);
             return true;
         }
+
+        public IEnumerable<PendingRfqMatch> GetPendingRfqMatches()
+        {
+            return _repository.GetPendingRfqMatches();
+        }
+
+        public bool ClearPendingRfqMatch(string rfqId)
+        {
+            _repository.ClearPendingRfqMatch(rfqId);
+            return true;
+        }
     }
 }

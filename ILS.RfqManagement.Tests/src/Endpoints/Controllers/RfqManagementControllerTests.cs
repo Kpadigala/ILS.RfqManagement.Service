@@ -630,5 +630,55 @@ namespace ILS.RfqManagement.Tests.Endpoints.Controllers
             actual.ShouldNotBeNull();
             serviceMock.Verify(s => s.MatchNewRfqToAssignmentRules(It.IsAny<MatchNewRfqToAssignmentRulesRequest>(), It.IsAny<string>()), Times.Never);
         }
+
+        [Fact]
+        public void GetPendingRfqMatches_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var pendingMatches = Builder<PendingRfqMatch>.CreateListOfSize(2).Build();
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.GetPendingRfqMatches()).Returns(pendingMatches).Verifiable();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.GetPendingRfqMatches();
+
+            // Assert
+            actual.Result.ShouldBeNull();
+            actual.Value.ShouldBe(pendingMatches);
+            serviceMock.Verify();
+        }
+
+        [Fact]
+        public void ClearPendingRfqMatch_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.ClearPendingRfqMatch("rfq-guid-1")).Returns(true).Verifiable();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.ClearPendingRfqMatch("rfq-guid-1");
+
+            // Assert
+            actual.Result.ShouldBeNull();
+            actual.Value.ShouldBe(true);
+            serviceMock.Verify();
+        }
+
+        [Fact]
+        public void ClearPendingRfqMatch_WithEmptyRfqId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.ClearPendingRfqMatch(string.Empty).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.ClearPendingRfqMatch(It.IsAny<string>()), Times.Never);
+        }
     }
 }

@@ -239,5 +239,38 @@ namespace ILS.RfqManagement.Tests.Services
             actual.ShouldBeTrue();
             repository.Verify();
         }
+
+        [Fact]
+        public void GetPendingRfqMatches_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var pendingMatches = Builder<PendingRfqMatch>.CreateListOfSize(2).Build();
+            var repository = new Mock<IRfqManagementRepository>();
+            repository.Setup(r => r.GetPendingRfqMatches()).Returns(pendingMatches).Verifiable();
+            var sut = new RfqManagementService(repository.Object);
+
+            // Act
+            var actual = sut.GetPendingRfqMatches();
+
+            // Assert
+            actual.ShouldBe(pendingMatches);
+            repository.Verify();
+        }
+
+        [Fact]
+        public void ClearPendingRfqMatch_ShouldReturnTrue()
+        {
+            // Arrange
+            var repository = new Mock<IRfqManagementRepository>();
+            repository.Setup(r => r.ClearPendingRfqMatch("rfq-guid-1")).Verifiable();
+            var sut = new RfqManagementService(repository.Object);
+
+            // Act
+            var actual = sut.ClearPendingRfqMatch("rfq-guid-1");
+
+            // Assert
+            actual.ShouldBeTrue();
+            repository.Verify();
+        }
     }
 }
