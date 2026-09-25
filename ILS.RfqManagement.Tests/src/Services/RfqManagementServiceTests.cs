@@ -258,15 +258,15 @@ namespace ILS.RfqManagement.Tests.Services
         }
 
         [Fact]
-        public void ClearPendingRfqMatch_ShouldReturnTrue()
+        public void MarkAssignmentMatchStatus_ShouldReturnTrue()
         {
             // Arrange
             var repository = new Mock<IRfqManagementRepository>();
-            repository.Setup(r => r.ClearPendingRfqMatch("rfq-guid-1")).Verifiable();
+            repository.Setup(r => r.MarkAssignmentMatchStatus("rfqsupplier-guid-1", 1)).Verifiable();
             var sut = new RfqManagementService(repository.Object);
 
             // Act
-            var actual = sut.ClearPendingRfqMatch("rfq-guid-1");
+            var actual = sut.MarkAssignmentMatchStatus("rfqsupplier-guid-1", 1);
 
             // Assert
             actual.ShouldBeTrue();

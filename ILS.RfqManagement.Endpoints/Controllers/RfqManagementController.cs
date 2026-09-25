@@ -18,6 +18,9 @@ namespace ILS.RfqManagement.Endpoints.Controllers
     [ApiController]
     public class RfqManagementController : ControllerBase
     {
+        private const int AssignmentMatchStatusMatched = 1;
+        private const int AssignmentMatchStatusError = -1;
+
         private readonly IRfqManagementService _service;
 
         public RfqManagementController(IRfqManagementService service)
@@ -310,22 +313,42 @@ namespace ILS.RfqManagement.Endpoints.Controllers
         }
 
         /// <summary>
-        /// Marks an RFQ as done matching, once every supplier returned for it by pendingRfqMatches has been
-        /// matched successfully. Called by the RFQ Assignment matching batch application.
+        /// Marks one pending RFQ/supplier pair (an rfq.tbrfqsupplier row) as successfully matched. Called by the
+        /// RFQ Assignment matching batch application after a successful matchNewRfqToAssignmentRules call.
         /// </summary>
-        /// <param name="rfqId">The RFQ identifier.</param>
+        /// <param name="rfqSupplierId">The rfq.tbrfqsupplier row identifier.</param>
         /// <returns>True when the update completed.</returns>
         /// <response code="200">Returns true.</response>
-        /// <response code="400">If the rfqId is missing or invalid.</response>
-        [HttpPost("pendingRfqMatches/{rfqId}/clear")]
+        /// <response code="400">If the rfqSupplierId is missing or invalid.</response>
+        [HttpPost("pendingRfqMatches/{rfqSupplierId}/matched")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public ActionResult<bool> ClearPendingRfqMatch(string rfqId)
+        public ActionResult<bool> MarkAssignmentMatched(string rfqSupplierId)
         {
-            if (string.IsNullOrEmpty(rfqId))
-                return BadRequest(new { Message = "rfqId is empty." });
+            if (string.IsNullOrEmpty(rfqSupplierId))
+                return BadRequest(new { Message = "rfqSupplierId is empty." });
 
-            return _service.ClearPendingRfqMatch(rfqId);
+            return _service.MarkAssignmentMatchStatus(rfqSupplierId, AssignmentMatchStatusMatched);
+        }
+
+        /// <summary>
+        /// Marks one pending RFQ/supplier pair (an rfq.tbrfqsupplier row) as failed to match -- a terminal
+        /// outcome, not retried on the batch's next run. Called by the RFQ Assignment matching batch application
+        /// after a failed matchNewRfqToAssignmentRules call.
+        /// </summary>
+        /// <param name="rfqSupplierId">The rfq.tbrfqsupplier row identifier.</param>
+        /// <returns>True when the update completed.</returns>
+        /// <response code="200">Returns true.</response>
+        /// <response code="400">If the rfqSupplierId is missing or invalid.</response>
+        [HttpPost("pendingRfqMatches/{rfqSupplierId}/failed")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<bool> MarkAssignmentFailed(string rfqSupplierId)
+        {
+            if (string.IsNullOrEmpty(rfqSupplierId))
+                return BadRequest(new { Message = "rfqSupplierId is empty." });
+
+            return _service.MarkAssignmentMatchStatus(rfqSupplierId, AssignmentMatchStatusError);
         }
     }
 }

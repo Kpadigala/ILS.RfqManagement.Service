@@ -87,9 +87,9 @@ namespace ILS.RfqManagement.Services
             return _repository.GetPendingRfqMatches();
         }
 
-        public bool ClearPendingRfqMatch(string rfqId)
+        public bool MarkAssignmentMatchStatus(string rfqSupplierId, int status)
         {
-            _repository.ClearPendingRfqMatch(rfqId);
+            _repository.MarkAssignmentMatchStatus(rfqSupplierId, status);
             return true;
         }
     }

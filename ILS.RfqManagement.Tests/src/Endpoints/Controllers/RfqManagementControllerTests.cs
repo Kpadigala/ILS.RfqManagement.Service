@@ -650,15 +650,15 @@ namespace ILS.RfqManagement.Tests.Endpoints.Controllers
         }
 
         [Fact]
-        public void ClearPendingRfqMatch_ShouldReturnCorrectValue()
+        public void MarkAssignmentMatched_ShouldReturnCorrectValue()
         {
             // Arrange
             var serviceMock = new Mock<IRfqManagementService>();
-            serviceMock.Setup(s => s.ClearPendingRfqMatch("rfq-guid-1")).Returns(true).Verifiable();
+            serviceMock.Setup(s => s.MarkAssignmentMatchStatus("rfqsupplier-guid-1", 1)).Returns(true).Verifiable();
             var sut = new RfqManagementController(serviceMock.Object);
 
             // Act
-            var actual = sut.ClearPendingRfqMatch("rfq-guid-1");
+            var actual = sut.MarkAssignmentMatched("rfqsupplier-guid-1");
 
             // Assert
             actual.Result.ShouldBeNull();
@@ -667,18 +667,50 @@ namespace ILS.RfqManagement.Tests.Endpoints.Controllers
         }
 
         [Fact]
-        public void ClearPendingRfqMatch_WithEmptyRfqId_ShouldReturnBadRequest()
+        public void MarkAssignmentMatched_WithEmptyRfqSupplierId_ShouldReturnBadRequest()
         {
             // Arrange
             var serviceMock = new Mock<IRfqManagementService>();
             var sut = new RfqManagementController(serviceMock.Object);
 
             // Act
-            var actual = sut.ClearPendingRfqMatch(string.Empty).Result as BadRequestObjectResult;
+            var actual = sut.MarkAssignmentMatched(string.Empty).Result as BadRequestObjectResult;
 
             // Assert
             actual.ShouldNotBeNull();
-            serviceMock.Verify(s => s.ClearPendingRfqMatch(It.IsAny<string>()), Times.Never);
+            serviceMock.Verify(s => s.MarkAssignmentMatchStatus(It.IsAny<string>(), It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public void MarkAssignmentFailed_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            serviceMock.Setup(s => s.MarkAssignmentMatchStatus("rfqsupplier-guid-1", -1)).Returns(true).Verifiable();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.MarkAssignmentFailed("rfqsupplier-guid-1");
+
+            // Assert
+            actual.Result.ShouldBeNull();
+            actual.Value.ShouldBe(true);
+            serviceMock.Verify();
+        }
+
+        [Fact]
+        public void MarkAssignmentFailed_WithEmptyRfqSupplierId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.MarkAssignmentFailed(string.Empty).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.MarkAssignmentMatchStatus(It.IsAny<string>(), It.IsAny<int>()), Times.Never);
         }
     }
 }

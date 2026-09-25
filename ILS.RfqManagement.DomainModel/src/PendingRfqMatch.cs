@@ -7,6 +7,15 @@ namespace ILS.RfqManagement.DomainModel
     public class PendingRfqMatch
     {
         /// <summary>
+        /// Gets or sets the rfq.tbrfqsupplier row identifier this pending match applies to. Passed back to
+        /// <c>MarkAssignmentMatchStatus</c> to record the per-supplier match outcome.
+        /// </summary>
+        /// <value>
+        /// The RFQ supplier row identifier.
+        /// </value>
+        public string RfqSupplierId { get; set; }
+
+        /// <summary>
         /// Gets or sets the RFQ identifier.
         /// </summary>
         /// <value>

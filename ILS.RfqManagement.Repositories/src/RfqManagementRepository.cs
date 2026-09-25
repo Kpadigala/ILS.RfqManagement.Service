@@ -225,17 +225,17 @@ namespace ILS.RfqManagement.Repositories
         {
             using var cn = _connectionFactory.Connection;
             return cn.Query<PendingRfqMatch>(
-                "RFQ.pkgRFQManagement.spGetPendingRfqMatches",
+                "RFQ.pkgRFQManagement.spGetPendingAssignmentMatches",
                 new { },
                 new { outpendingmatches = RefCursor.Value }).ToList();
         }
 
-        public void ClearPendingRfqMatch(string rfqId)
+        public void MarkAssignmentMatchStatus(string rfqSupplierId, int status)
         {
             using var cn = _connectionFactory.Connection;
             cn.ExecuteScalar(
-                "RFQ.pkgRFQManagement.spClearPendingRfqMatch",
-                new { inrfqid = rfqId },
+                "RFQ.pkgRFQManagement.spMarkAssignmentMatchStatus",
+                new { inrfqsupplierid = rfqSupplierId, instatus = status },
                 new { });
         }
 

@@ -31,6 +31,6 @@ namespace ILS.RfqManagement.DomainModel.Contracts.Services
 
         IEnumerable<PendingRfqMatch> GetPendingRfqMatches();
 
-        bool ClearPendingRfqMatch(string rfqId);
+        bool MarkAssignmentMatchStatus(string rfqSupplierId, int status);
     }
 }
