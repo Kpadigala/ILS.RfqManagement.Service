@@ -31,6 +31,17 @@ namespace ILS.RfqManagement.Repositories
             return MapToDetails(rows);
         }
 
+        public IEnumerable<AdministratorDetail> GetAdministeredCompanies(string companyId)
+        {
+            using var cn = _connectionFactory.Connection;
+            var rows = cn.Query<AdministratorRow>(
+                "RFQ.pkgRFQManagement.spGetAdministeredCompanies",
+                new { incompanyid = companyId },
+                new { outadministrations = RefCursor.Value });
+
+            return MapToDetails(rows);
+        }
+
         public void AddAdministrators(AddAdministratorsRequest request, string auditUser)
         {
             var companyIds = (Clob)JsonConvert.SerializeObject(request.AdminCompanyIds);

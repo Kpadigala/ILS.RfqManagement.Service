@@ -20,6 +20,11 @@ namespace ILS.RfqManagement.Services
             return _repository.GetAdministrators(supplierCompanyId);
         }
 
+        public IEnumerable<AdministratorDetail> GetAdministeredCompanies(string companyId)
+        {
+            return _repository.GetAdministeredCompanies(companyId);
+        }
+
         public IEnumerable<AdministratorDetail> AddAdministrators(AddAdministratorsRequest request, string auditUser)
         {
             _repository.AddAdministrators(request, auditUser);

@@ -50,6 +50,41 @@ namespace ILS.RfqManagement.Tests.Endpoints.Controllers
         }
 
         [Fact]
+        public void GetAdministeredCompanies_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var companyId = "8086";
+            var administrations = Builder<AdministratorDetail>.CreateListOfSize(2)
+                .All().With(a => a.AdminCompanyId = companyId)
+                .Build();
+            var service = TypeFactory.MakeService_GetAdministeredCompanies_ReturnValue(administrations);
+            var sut = new RfqManagementController(service.Object);
+
+            // Act
+            var actual = sut.GetAdministeredCompanies(companyId);
+
+            // Assert
+            actual.Result.ShouldBeNull();
+            actual.Value.ShouldBe(administrations);
+            service.Verify();
+        }
+
+        [Fact]
+        public void GetAdministeredCompanies_WithEmptyCompanyId_ShouldReturnBadRequest()
+        {
+            // Arrange
+            var serviceMock = new Mock<IRfqManagementService>();
+            var sut = new RfqManagementController(serviceMock.Object);
+
+            // Act
+            var actual = sut.GetAdministeredCompanies(string.Empty).Result as BadRequestObjectResult;
+
+            // Assert
+            actual.ShouldNotBeNull();
+            serviceMock.Verify(s => s.GetAdministeredCompanies(It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
         public void Add_ShouldReturnCorrectValue()
         {
             // Arrange

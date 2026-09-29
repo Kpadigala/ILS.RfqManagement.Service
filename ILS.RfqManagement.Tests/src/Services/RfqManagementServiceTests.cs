@@ -30,6 +30,23 @@ namespace ILS.RfqManagement.Tests.Services
         }
 
         [Fact]
+        public void GetAdministeredCompanies_ShouldReturnCorrectValue()
+        {
+            // Arrange
+            var administrations = Builder<AdministratorDetail>.CreateListOfSize(2).Build();
+            var repository = new Mock<IRfqManagementRepository>();
+            repository.Setup(r => r.GetAdministeredCompanies("8086")).Returns(administrations).Verifiable();
+            var sut = new RfqManagementService(repository.Object);
+
+            // Act
+            var actual = sut.GetAdministeredCompanies("8086");
+
+            // Assert
+            actual.ShouldBe(administrations);
+            repository.Verify();
+        }
+
+        [Fact]
         public void AddAdministrators_ShouldAddThenReturnCurrentAdministrators()
         {
             // Arrange

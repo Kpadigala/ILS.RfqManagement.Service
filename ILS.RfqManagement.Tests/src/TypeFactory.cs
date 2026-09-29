@@ -18,5 +18,17 @@ namespace ILS.RfqManagement.Tests
                 .Verifiable();
             return mock;
         }
+
+        /// <summary>
+        /// Creates a mock IRfqManagementService whose GetAdministeredCompanies method returns <paramref name="value"/>.
+        /// </summary>
+        public static Mock<IRfqManagementService> MakeService_GetAdministeredCompanies_ReturnValue(IEnumerable<AdministratorDetail> value)
+        {
+            var mock = new Mock<IRfqManagementService>();
+            mock.Setup(s => s.GetAdministeredCompanies(It.IsAny<string>()))
+                .Returns(value)
+                .Verifiable();
+            return mock;
+        }
     }
 }

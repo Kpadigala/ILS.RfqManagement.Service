@@ -47,6 +47,25 @@ namespace ILS.RfqManagement.Endpoints.Controllers
         }
 
         /// <summary>
+        /// Retrieves the supplier companies a company has been granted RFQ Management administrator
+        /// privileges for -- the reverse of GetAdministrators.
+        /// </summary>
+        /// <param name="companyId">The admin company identifier.</param>
+        /// <returns>The administrator records for the supplier companies this company administers.</returns>
+        /// <response code="200">Returns the administered companies.</response>
+        /// <response code="400">If the companyId is missing or invalid.</response>
+        [HttpGet("administered/{companyId}")]
+        [ProducesResponseType(typeof(IEnumerable<AdministratorDetail>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public ActionResult<IEnumerable<AdministratorDetail>> GetAdministeredCompanies(string companyId)
+        {
+            if (string.IsNullOrEmpty(companyId))
+                return BadRequest(new { Message = "companyId is empty." });
+
+            return _service.GetAdministeredCompanies(companyId).ToList();
+        }
+
+        /// <summary>
         /// Grants RFQ Management administrator privileges to one or more users for a supplier company.
         /// </summary>
         /// <param name="request">The supplier company and admin company ids to grant.</param>

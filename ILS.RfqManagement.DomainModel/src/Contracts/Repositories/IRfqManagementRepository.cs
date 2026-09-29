@@ -7,6 +7,8 @@ namespace ILS.RfqManagement.DomainModel.Contracts.Repositories
     {
         IEnumerable<AdministratorDetail> GetAdministrators(string supplierCompanyId);
 
+        IEnumerable<AdministratorDetail> GetAdministeredCompanies(string companyId);
+
         void AddAdministrators(AddAdministratorsRequest request, string auditUser);
 
         void RemoveAdministrators(RemoveAdministratorsRequest request, string auditUser);
